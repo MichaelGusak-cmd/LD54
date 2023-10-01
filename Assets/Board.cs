@@ -7,16 +7,8 @@ public class Board : MonoBehaviour
     public const int
         GRID_WIDTH = 16,
         GRID_HEIGHT = 32;
-    public const float PIECE_SIZE = 0.5f;
-    // public const float
-    //     LAYOUT_MARGIN = 0.95f;
 
-    // public const float
-    //     LAYOUT_W = (LAYOUT_MARGIN / GRID_HEIGHT) * GRID_WIDTH,
-    //     LAYOUT_H = LAYOUT_MARGIN,
-    //     PIECE_SIZE = LAYOUT_W / GRID_WIDTH;
-
-    // public static float pieceUnits;
+    static float PIECE_SIZE;
 
     const float FALL_INTERVAL = 0.5f;
     const float MOVE_INTERVAL = 0.25f;
@@ -41,19 +33,17 @@ public class Board : MonoBehaviour
         fallTimer = FALL_INTERVAL;
         droppingBag.leftColumn = 0;
         droppingBag.bottomRow = GRID_HEIGHT - droppingBag.height;
-        Vector3 parentPos;
-        Quaternion rotation;
-        transform.parent.GetLocalPositionAndRotation(out parentPos, out rotation);
-        droppingBag.transform.Translate(parentPos, Space.World);
-        droppingBag.transform.Translate(new Vector2(-2, 4), Space.Self);
+        // move to center
+        droppingBag.transform.Translate(transform.parent.localPosition);
+        // move to top left
+        droppingBag.transform.Translate(new Vector2(-PIECE_SIZE * GRID_WIDTH / 2, PIECE_SIZE * (GRID_HEIGHT / 2 - droppingBag.height)));
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        PIECE_SIZE = transform.parent.localScale.x;
         transform.localScale = new Vector2(GRID_WIDTH, GRID_HEIGHT);
-        // float heightUnits = transform.parent.localScale.y * LAYOUT_MARGIN;
-        // pieceUnits = heightUnits / GRID_HEIGHT;
 
         // generate an example backpack
         bool[,] filled = new bool[4, 4];
@@ -102,7 +92,7 @@ public class Board : MonoBehaviour
             if ((moveTimer -= Time.deltaTime) <= 0 && droppingBag.leftColumn > 0)
             {
                 moveTimer += MOVE_INTERVAL;
-                // droppingBag.moveLeft();
+                droppingBag.MoveLeft();
                 // todo: collisions. Maybe move it, and if it now overlaps
                 // something, move it back?
             }
@@ -112,7 +102,7 @@ public class Board : MonoBehaviour
             if ((moveTimer -= Time.deltaTime) <= 0 && droppingBag.leftColumn < GRID_WIDTH - 1)
             {
                 moveTimer += MOVE_INTERVAL;
-                // droppingBag.moveRight();
+                droppingBag.MoveRight();
             }
         }
 
@@ -122,7 +112,7 @@ public class Board : MonoBehaviour
         fallTimer -= (BoardControls.getFastDrop() ?  Time.deltaTime * 2 : Time.deltaTime);
         if (fallTimer <= 0)
         {
-            // droppingBag.moveDown();
+            droppingBag.MoveDown();
             // todo: if collision occurred or we're at the bottom of the board,
             // move back (for collisions only) and convert bag to normal pieces
         }

@@ -47,16 +47,20 @@ public class Backpack : MonoBehaviour
 
     public void Update()
     {
-        for (int i = 0; i < height; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                if (pieces[i, j] != null)
-                {
-                    pieces[i, j].transform
-                        .Translate(new Vector2(0, -0.1f) * Time.deltaTime);
-                }
-            }
-        }
+    }
+
+    public void MoveLeft()
+    {
+
+    }
+
+    public void MoveRight()
+    {
+
+    }
+
+    public void MoveDown()
+    {
+
     }
 }
