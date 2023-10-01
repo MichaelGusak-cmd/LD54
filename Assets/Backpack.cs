@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Backpack : MonoBehaviour
+public class Backpack
 {
     public bool[,] Grid { get; set; }
     public List<GameObject> Pieces { get; set; }
