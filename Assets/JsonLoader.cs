@@ -3,6 +3,12 @@ using UnityEngine;
 using System.Collections.Generic;
 
 [System.Serializable]
+public class TetrisPiecesData
+{
+    public List<PieceData> tetrisPieces;
+}
+
+[System.Serializable]
 public class PieceData
 {
     public string name;
@@ -12,18 +18,18 @@ public class PieceData
 public class JsonLoader : MonoBehaviour
 {
     public TextAsset jsonFile; // Reference to the JSON file in Unity's inspector
-    public List<PieceData> pieceDataList; // A list to store the deserialized JSON data
+    public TetrisPiecesData tetrisPiecesData; // A class to store the deserialized JSON data
 
     private void Start()
     {
         if (jsonFile != null)
         {
-            // Deserialize the JSON data into the pieceDataList
-            pieceDataList = new List<PieceData>(JsonUtility.FromJson<PieceData[]>(jsonFile.text));
+            // Deserialize the JSON data into the tetrisPiecesData object
+            tetrisPiecesData = JsonUtility.FromJson<TetrisPiecesData>(jsonFile.text);
 
-            if (pieceDataList.Count > 0)
+            if (tetrisPiecesData != null && tetrisPiecesData.tetrisPieces.Count > 0)
             {
-                // The JSON data has been loaded into pieceDataList
+                // The JSON data has been loaded into tetrisPiecesData
             }
             else
             {

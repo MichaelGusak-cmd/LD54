@@ -2607,6 +2607,7 @@ GameObject:
   - component: {fileID: 1096416460}
   - component: {fileID: 1096416459}
   - component: {fileID: 1096416458}
+  - component: {fileID: 1096416461}
   m_Layer: 5
   m_Name: QueuePanel
   m_TagString: Untagged
@@ -2703,6 +2704,23 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1096416456}
   m_CullTransparentMesh: 1
+--- !u!114 &1096416461
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1096416456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13601b9e91f1fba4e992189c5d2ef359, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  squareSize: 64
+  spawnTimer: 2
+  pieceSourcePrefab: {fileID: 1935992465942843601, guid: d9a930fb278f07b41b08eb4983a86bee, type: 3}
+  piecePrefab: {fileID: 4522964832995946844, guid: 841394c1d712d4d4b926680e1cbc9327, type: 3}
+  count: 0
 --- !u!1 &1149235596
 GameObject:
   m_ObjectHideFlags: 0
@@ -3824,7 +3842,6 @@ GameObject:
   - component: {fileID: 1829902561}
   - component: {fileID: 1829902560}
   - component: {fileID: 1829902559}
-  - component: {fileID: 1829902558}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -3832,20 +3849,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1829902558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1829902557}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e83b7472b331e61459bb404421e0afb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jsonFile: {fileID: 4900000, guid: 2df5fc39f5fe11b4b8c86f65d1ebc7d6, type: 3}
-  pieceDataList: []
 --- !u!114 &1829902559
 MonoBehaviour:
   m_ObjectHideFlags: 0
