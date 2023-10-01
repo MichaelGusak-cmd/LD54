@@ -51,16 +51,72 @@ public class Backpack : MonoBehaviour
 
     public void MoveLeft()
     {
-
+        if (leftColumn > 0)
+        {
+            --leftColumn;
+            transform.Translate(new Vector2(-Board.PIECE_SIZE, 0));
+        }
     }
 
     public void MoveRight()
     {
-
+        if (leftColumn + width < Board.GRID_WIDTH)
+        {
+            ++leftColumn;
+            transform.Translate(new Vector2(Board.PIECE_SIZE, 0));
+        }
     }
 
-    public void MoveDown()
+    public void MoveDownUnchecked()
     {
+        --bottomRow;
+        transform.Translate(new Vector2(0, -Board.PIECE_SIZE));
+    }
 
+    public void MoveUp()
+    {
+        if (bottomRow + height < Board.GRID_HEIGHT)
+        {
+            ++bottomRow;
+            transform.Translate(new Vector2(0, Board.PIECE_SIZE));
+        }
+    }
+
+    public void Rotate()
+    {
+        // translate all pieces to 0, 0
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (pieces[i, j] != null)
+                    pieces[i, j].transform.Translate(
+                        new Vector2(-Board.PIECE_SIZE * j, -Board.PIECE_SIZE * i));
+            }
+        }
+
+        // convert columns to rows and vice-versa
+        Piece[,] newPieces = new Piece[width, height];
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                newPieces[width - (j + 1), i] = pieces[i, j];
+            }
+        }
+
+        (width, height) = (height, width);
+        pieces = newPieces;
+
+        // translate all pieces to their new spot
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (pieces[i, j] != null)
+                    pieces[i, j].transform.Translate(
+                        new Vector2(Board.PIECE_SIZE * j, Board.PIECE_SIZE * i));
+            }
+        }
     }
 }
