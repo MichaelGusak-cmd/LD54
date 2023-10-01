@@ -2,51 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Backpack
+public class Backpack : MonoBehaviour
 {
-    public bool[,] Grid { get; set; }
-    public List<GameObject> Pieces { get; set; }
-    public List<GameObject> InGrid { get; set; }
-    public bool Ready { get; set; }
+    public Piece[,] pieces;
+    public int width, height;
+    public int leftColumn, bottomRow;
 
-    public void Start() {
-        Ready = false;
-        Generate(3,4);
+    public void Start()
+    {
+        
     }
 
-    public void Generate(int x, int y) {
-        Grid = new bool[x,y];
-        SetPieceAt(1,1);
-        Ready = true;
-    }
+    public void Generate(bool[,] filled)
+    {
+        height = filled.GetLength(0);
+        width = filled.GetLength(1);
+        leftColumn = 0;
+        bottomRow = 0;
+        pieces = new Piece[height, width];
 
-    public void SetPieceAt(int x, int y) {
-        GameObject p = Pieces[0];
-        Piece piece = p.GetComponent<Piece>()
-        piece.SetPos(x,y);
-        piece.SetRot(Vector2.right);
-        bool[,] locations = piece.GetPlacements();
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (filled[i, j])
+                {
+                    // todo: use a texture
+                    // fornow: use a color gradient
+                    Texture2D tex = new Texture2D(1, 1);
+                    Color c = new(1, i / (float)(height - 1), j / (float)(width - 1), 1);
+                    tex.SetPixel(0, 0, c);
+                    tex.Apply();
 
-
-        bool valid = true;
-        for (int i = 0; i < locations.GetLength(0) && valid; i++) {
-            for (int j = 0; j < locations.GetLength(1) && valid; j++) {
-                if (i+x > Grid.GetLength(0) || y+j > Grid.GetLength(1)) {
-                    valid = false;
+                    var o = GameObject.Instantiate(GameObject.Find("Piece"));
+                    pieces[i, j] = o.GetComponent<Piece>();
+                    pieces[i, j].sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0, 0), 1.0f / Board.pieceUnits);
+                    pieces[i, j].transform.parent = transform;
+                    pieces[i, j].transform.Translate(new Vector2(j * Board.pieceUnits, i * Board.pieceUnits));
                 }
-                if (Grid[i+x,j+y] && locations[i,j] && valid) 
-                    valid = false;
             }
         }
+    }
 
-        if (valid) {
-            for (int i = 0; i < locations.GetLength(0); i++) {
-                for (int j = 0; j < locations.GetLength(1); j++) {
-                    if (locations[i,j]) 
-                        Grid[x+i, y+j] = true;
+    public void Update()
+    {
+        for (int i = 0; i < height; i++)
+        {
+            for (int j = 0; j < width; j++)
+            {
+                if (pieces[i, j] != null)
+                {
+                    pieces[i, j].transform
+                        .Translate(new Vector2(0, -0.1f) * Time.deltaTime);
                 }
             }
-            InGrid.Add(p);
         }
     }
 }
