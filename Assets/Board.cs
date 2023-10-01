@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static System.Math;
 
 public class Board : MonoBehaviour
 {
@@ -9,16 +10,21 @@ public class Board : MonoBehaviour
         GRID_HEIGHT = 32;
 
     public static float PIECE_SIZE;
+    // units scrolled per second
+    static float SCROLL_SPEED;
+    // piece sizes scrolled per second
+    const float SCROLL_PIECE_SPEED = 0.5f;
 
     const float FALL_INTERVAL = 0.5f;
     const float MOVE_INTERVAL = 0.25f;
-
+    
     Piece[,] grid = new Piece[GRID_HEIGHT, GRID_WIDTH];
 
     Backpack droppingBag;
 
     float fallTimer = FALL_INTERVAL;
     float moveTimer = 0;
+    float scrollCounter = 0;
 
     // Can a new bag be dropped? False if there is already one being dropped
     public bool CanDropBag()
@@ -51,6 +57,7 @@ public class Board : MonoBehaviour
     void Start()
     {
         PIECE_SIZE = transform.parent.localScale.x;
+        SCROLL_SPEED = PIECE_SIZE * SCROLL_PIECE_SPEED;
         transform.localScale = new Vector2(GRID_WIDTH, GRID_HEIGHT);
 
         // generate an example backpack
@@ -76,17 +83,48 @@ public class Board : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float currScroll = SCROLL_SPEED * Time.deltaTime;
+        scrollCounter += currScroll;
+
         if (droppingBag != null)
         {
-            updateDroppingBag();
+            UpdateDroppingBag();
+            droppingBag.transform.Translate(new Vector2(0, -currScroll));
         }
         
-        // todo move blocks sprites down
+        // move block sprites down
+        for (int i = 0; i < GRID_HEIGHT; i++)
+        {
+            for (int j = 0; j < GRID_WIDTH; j++)
+            {
+                if (grid[i, j] != null)
+                {
+                    grid[i, j].transform.Translate(new Vector2(0, -currScroll));
+                }
+            }
+        }
 
-        // todo if blocks are low enough, delete bottom row, move all others down
+        // if blocks are low enough, delete bottom row, move all others down
+        if (scrollCounter >= PIECE_SIZE)
+        {
+            scrollCounter -= PIECE_SIZE;
+            for (int i = 0; i < GRID_HEIGHT - 1; i++)
+            {
+                for (int j = 0; j < GRID_WIDTH; j++)
+                {
+                    grid[i, j] = grid[i + 1, j];
+                }
+            }
+            for (int j = 0; j < GRID_WIDTH; j++)
+            {
+                grid[GRID_HEIGHT - 1, j] = null;
+            }
+            // todo: need to do a full check like when making it fall
+            // droppingBag.bottomRow = Max(0, droppingBag.bottomRow - 1);
+        }
     }
 
-    void updateDroppingBag()
+    void UpdateDroppingBag()
     {
         // handle moving left/right
         if (BoardControls.MoveLeft())
