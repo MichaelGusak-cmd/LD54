@@ -4,53 +4,49 @@ using UnityEngine;
 
 public class Backpack
 {
-    // pieces are initialized externally by BackpackGenerator
-    public Piece[,] pieces;
-    // set by Board when Backpack is sent to it
-    public int bottomRow, leftColumn, width, height;
+    public bool[,] Grid { get; set; }
+    public List<GameObject> Pieces { get; set; }
+    public List<GameObject> InGrid { get; set; }
+    public bool Ready { get; set; }
 
-    public Backpack(int width_, int height_)
-    {
-        pieces = new Piece[width_, height_];
-        width = width_;
-        height = height_;
-        bottomRow = 0;
-        leftColumn = 0;
+    public void Start() {
+        Ready = false;
+        Generate(3,4);
     }
 
-    public void moveLeft()
-    {
-        if (leftColumn > 0)
-        {
-            leftColumn--;
-            foreach (var piece in pieces)
-            {
-                piece.transform.Translate(new Vector2(-1, 0));
+    public void Generate(int x, int y) {
+        Grid = new bool[x,y];
+        SetPieceAt(1,1);
+        Ready = true;
+    }
+
+    public void SetPieceAt(int x, int y) {
+        GameObject p = Pieces[0];
+        Piece piece = p.GetComponent<Piece>()
+        piece.SetPos(x,y);
+        piece.SetRot(Vector2.right);
+        bool[,] locations = piece.GetPlacements();
+
+
+        bool valid = true;
+        for (int i = 0; i < locations.GetLength(0) && valid; i++) {
+            for (int j = 0; j < locations.GetLength(1) && valid; j++) {
+                if (i+x > Grid.GetLength(0) || y+j > Grid.GetLength(1)) {
+                    valid = false;
+                }
+                if (Grid[i+x,j+y] && locations[i,j] && valid) 
+                    valid = false;
             }
         }
-    }
 
-    public void moveRight()
-    {
-        if (leftColumn < Board.GRID_WIDTH - 1)
-        {
-            leftColumn++;
-            foreach (var piece in pieces)
-            {
-                piece.transform.Translate(new Vector2(1, 0));
+        if (valid) {
+            for (int i = 0; i < locations.GetLength(0); i++) {
+                for (int j = 0; j < locations.GetLength(1); j++) {
+                    if (locations[i,j]) 
+                        Grid[x+i, y+j] = true;
+                }
             }
-        }
-    }
-
-    public void moveDown()
-    {
-        if (bottomRow > 0)
-        {
-            bottomRow--;
-            foreach (var piece in pieces)
-            {
-                piece.transform.Translate(new Vector2(0, -1));
-            }
+            InGrid.Add(p);
         }
     }
 }
