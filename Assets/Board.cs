@@ -7,15 +7,16 @@ public class Board : MonoBehaviour
     public const int
         GRID_WIDTH = 16,
         GRID_HEIGHT = 32;
-    public const float
-        LAYOUT_MARGIN = 0.95f;
+    public const float PIECE_SIZE = 0.5f;
+    // public const float
+    //     LAYOUT_MARGIN = 0.95f;
 
-    public const float
-        LAYOUT_W = (LAYOUT_MARGIN / GRID_HEIGHT) * GRID_WIDTH,
-        LAYOUT_H = LAYOUT_MARGIN,
-        PIECE_SIZE = LAYOUT_W / GRID_WIDTH;
+    // public const float
+    //     LAYOUT_W = (LAYOUT_MARGIN / GRID_HEIGHT) * GRID_WIDTH,
+    //     LAYOUT_H = LAYOUT_MARGIN,
+    //     PIECE_SIZE = LAYOUT_W / GRID_WIDTH;
 
-    public static float pieceUnits;
+    // public static float pieceUnits;
 
     const float FALL_INTERVAL = 0.5f;
     const float MOVE_INTERVAL = 0.25f;
@@ -44,27 +45,15 @@ public class Board : MonoBehaviour
         Quaternion rotation;
         transform.parent.GetLocalPositionAndRotation(out parentPos, out rotation);
         droppingBag.transform.Translate(parentPos, Space.World);
+        droppingBag.transform.Translate(new Vector2(-2, 4), Space.Self);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        /*
-        // if we go by height, this is the width we'll get
-        const float maxWidth = (LAYOUT_MARGIN / GRID_HEIGHT) * GRID_WIDTH;
-        // if width is small enough, use it
-        if (maxWidth <= LAYOUT_MARGIN)
-        {
-            transform.localScale = new Vector2(maxWidth, LAYOUT_MARGIN);
-        }
-        else
-        {
-            transform.localScale = new Vector2(LAYOUT_MARGIN, (LAYOUT_MARGIN / GRID_WIDTH) * GRID_HEIGHT);
-        }
-        */
-        transform.localScale = new Vector2(LAYOUT_W, LAYOUT_H);
-        float heightUnits = transform.parent.localScale.y * LAYOUT_MARGIN;
-        pieceUnits = heightUnits / GRID_HEIGHT;
+        transform.localScale = new Vector2(GRID_WIDTH, GRID_HEIGHT);
+        // float heightUnits = transform.parent.localScale.y * LAYOUT_MARGIN;
+        // pieceUnits = heightUnits / GRID_HEIGHT;
 
         // generate an example backpack
         bool[,] filled = new bool[4, 4];
@@ -77,17 +66,11 @@ public class Board : MonoBehaviour
         }
 
         var backpack = GameObject.Instantiate(GameObject.Find("Backpack"));
-        backpack.transform.parent = transform;
-        backpack.transform.localScale = new Vector2(1.0f / GRID_WIDTH, 1.0f / GRID_HEIGHT);
+        backpack.transform.parent = transform.parent;
+        backpack.transform.localScale = Vector2.one;
         var b = backpack.GetComponent<Backpack>();
         b.Generate(filled);
         DropBag(b);
-
-        // GameObject backpackObject = new();
-        // backpackObject.AddComponent<Backpack>();
-        // var b = backpackObject.GetComponent<Backpack>();
-        // b.Generate(filled);
-        // DropBag(b);
     }
 
     /*

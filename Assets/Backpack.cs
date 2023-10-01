@@ -35,10 +35,11 @@ public class Backpack : MonoBehaviour
                     tex.Apply();
 
                     var o = GameObject.Instantiate(GameObject.Find("Piece"));
+                    o.transform.parent = transform;
+                    o.transform.localScale = Vector2.one;
                     pieces[i, j] = o.GetComponent<Piece>();
-                    pieces[i, j].sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0, 0), 1.0f / Board.pieceUnits);
-                    pieces[i, j].transform.parent = transform;
-                    pieces[i, j].transform.Translate(new Vector2(j * Board.pieceUnits, i * Board.pieceUnits));
+                    pieces[i, j].sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0, 0), 1.0f);
+                    pieces[i, j].transform.Translate(pieces[i, j].transform.localToWorldMatrix.MultiplyVector(new Vector3(j, i, 0)));
                 }
             }
         }
