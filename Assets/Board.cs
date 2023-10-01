@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using static System.Math;
 
 public class Board : MonoBehaviour
@@ -13,7 +14,8 @@ public class Board : MonoBehaviour
     // units scrolled per second
     static float SCROLL_SPEED;
     // piece sizes scrolled per second
-    const float SCROLL_PIECE_SPEED = 0.5f;
+    const float SCROLL_PIECE_SPEED = 0.1f;
+    bool scrollConveyor = false;
 
     const float FALL_INTERVAL = 0.5f;
     const float MOVE_INTERVAL = 0.25f;
@@ -37,7 +39,7 @@ public class Board : MonoBehaviour
     {
         fallTimer = FALL_INTERVAL;
 
-        var backpackObj = GameObject.Instantiate(GameObject.Find("Backpack"));
+        GameObject backpackObj = Instantiate(GameObject.FindGameObjectWithTag("BackpackTemplate"));
         droppingBag = backpackObj.GetComponent<Backpack>();
 
         droppingBag.transform.parent = transform.parent;
@@ -51,6 +53,8 @@ public class Board : MonoBehaviour
         droppingBag.transform.Translate(transform.parent.localPosition);
         // move to top left
         droppingBag.transform.Translate(new Vector2(-PIECE_SIZE * GRID_WIDTH / 2, PIECE_SIZE * (GRID_HEIGHT / 2 - droppingBag.height)));
+        // align with everything else's visiual scroll
+        droppingBag.transform.Translate(new Vector2(0, -scrollCounter));
     }
 
     // Start is called before the first frame update
@@ -58,7 +62,6 @@ public class Board : MonoBehaviour
     {
         PIECE_SIZE = transform.parent.localScale.x;
         SCROLL_SPEED = PIECE_SIZE * SCROLL_PIECE_SPEED;
-        transform.localScale = new Vector2(GRID_WIDTH, GRID_HEIGHT);
 
         // generate an example backpack
         bool[,] filled = new bool[4, 4];
@@ -71,14 +74,6 @@ public class Board : MonoBehaviour
         }
         DropBag(filled);
     }
-
-    /*
-     * Blocks already in board need to move downwards, be cleared if moved a
-     * whole unit
-     * 
-     * Newly dropped blocks need to move down 1 row periodically, player can
-     * rotate them and move side to side, player can also make them fall faster
-     */
 
     // Update is called once per frame
     void Update()
@@ -104,10 +99,27 @@ public class Board : MonoBehaviour
             }
         }
 
+        // move conveyor down
+        transform.position += new Vector3(0, -currScroll, 0);
+
         // if blocks are low enough, delete bottom row, move all others down
         if (scrollCounter >= PIECE_SIZE)
         {
             scrollCounter -= PIECE_SIZE;
+
+            if (scrollConveyor)
+                transform.Translate(new Vector2(0, PIECE_SIZE * 2));
+            scrollConveyor = !scrollConveyor;
+
+            // destroy bottom row
+            for (int j = 0; j < GRID_WIDTH; j++)
+            {
+                if (grid[0, j] != null)
+                {
+                    Destroy(grid[0, j].gameObject);
+                    grid[0, j] = null;
+                }
+            }
             for (int i = 0; i < GRID_HEIGHT - 1; i++)
             {
                 for (int j = 0; j < GRID_WIDTH; j++)
@@ -119,8 +131,14 @@ public class Board : MonoBehaviour
             {
                 grid[GRID_HEIGHT - 1, j] = null;
             }
-            // todo: need to do a full check like when making it fall
-            // droppingBag.bottomRow = Max(0, droppingBag.bottomRow - 1);
+
+            // move droppingBag, check if it should be added
+            droppingBag.MoveDownUnchecked();
+            droppingBag.transform.Translate(new Vector2(0, PIECE_SIZE));
+            if (droppingBag.bottomRow < 0 || Overlap())
+            {
+                AddToBoard();
+            }
         }
     }
 
