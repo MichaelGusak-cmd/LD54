@@ -1,0 +1,53 @@
+{
+    "tetrisPieces": [
+      {
+        "name": "I-Piece",
+        "shape": [
+          [true, true, true, true]
+        ]
+      },
+      {
+        "name": "J-Piece",
+        "shape": [
+          [true, false, false],
+          [true, true, true]
+        ]
+      },
+      {
+        "name": "L-Piece",
+        "shape": [
+          [false, false, true],
+          [true, true, true]
+        ]
+      },
+      {
+        "name": "O-Piece",
+        "shape": [
+          [true, true],
+          [true, true]
+        ]
+      },
+      {
+        "name": "S-Piece",
+        "shape": [
+          [false, true, true],
+          [true, true, false]
+        ]
+      },
+      {
+        "name": "T-Piece",
+        "shape": [
+          [false, true, false],
+          [true, true, true]
+        ]
+      },
+      {
+        "name": "Z-Piece",
+        "shape": [
+          [true, true, false],
+          [false, true, true]
+        ]
+      }
+    ]
+  }
+  
