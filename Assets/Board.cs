@@ -17,7 +17,7 @@ public class Board : MonoBehaviour
     const float SCROLL_PIECE_SPEED = 0.1f;
     bool scrollConveyor = false;
 
-    const float FALL_INTERVAL = 0.5f;
+    const float FALL_INTERVAL = 0.4f;
     const float MOVE_INTERVAL = 0.25f;
     
     Piece[,] grid = new Piece[GRID_HEIGHT, GRID_WIDTH];
