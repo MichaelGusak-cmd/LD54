@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static System.Math;
 
 public class QueueUpPieces : MonoBehaviour
 {
@@ -13,11 +14,13 @@ public class QueueUpPieces : MonoBehaviour
 
     public static GameObject queuePiecePrefab;
     public static GameObject piecePrefab;
+    public static Camera mainCamera;
 
     void Start()
     {
         queuePiecePrefab = Resources.Load<GameObject>("Prefabs/QueuePiecePrefab");
         piecePrefab = Resources.Load<GameObject>("Prefabs/PiecePrefab");
+        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
         QueuePiece.Init();
     }
 
@@ -27,53 +30,40 @@ public class QueueUpPieces : MonoBehaviour
         if ((spawnTimer -= Time.deltaTime) <= 0)
         {
             spawnTimer += SPAWN_INTERVAL;
-            QueuePiece newPiece = QueuePiece.Generate();
-            bool spotFound = false;
-            for (int i = 0; !spotFound && i < pieces.Length; i++)
+
+            int slotIndex = -1;
+            for (int i = 0; slotIndex < 0 && i < pieces.Length; i++)
             {
                 if (pieces[i] == null)
                 {
-                    pieces[i] = newPiece;
-                    pieces[i].transform.parent = transform.GetChild(i);
-                    pieces[i].transform.localPosition = Vector3.zero;
-                    spotFound = true;
+                    slotIndex = i;
                 }
             }
-            // todo: if (!spotFound) {GAME OVER}
-        }
-    }
 
-    /*
-    public GameObject SpawnPiece() {
-        GameObject parent = Instantiate(pieceSourcePrefab, new Vector3(count, 0, 0), Quaternion.identity);
-        QueuePiece p = parent.GetComponent<QueuePiece>();
-        p.Load();
-        
-        for (int i = 0; i < p.fill.GetLength(0); i++) {
-            for (int j = 0; j < p.fill.GetLength(1); j++) {
-                if (p.fill[i,j]) {
-                    // Instantiate the prefab as a child of the parent
-                    GameObject piece = Instantiate(piecePrefab, parent.transform);
+            // todo: if slotIndex < 0, GAME OVER!
+            if (slotIndex >= 0)
+            {
+                var pos = mainCamera.ScreenToWorldPoint(transform.GetChild(slotIndex).position);
+                GameObject queuePieceObj = Instantiate(queuePiecePrefab, Vector3.zero, Quaternion.identity);
+                QueuePiece queuePiece = queuePieceObj.GetComponent<QueuePiece>();
+                queuePiece.Generate();
+                queuePiece.transform.Translate(pos);
 
-                    piece.transform.localPosition = new Vector3(i,j);
-                    piece.transform.localRotation = Quaternion.identity;
-                    piece.transform.localScale = Vector3.one;
+                Vector3[] corners = new Vector3[4];
+                RectTransform rt = transform.GetChild(slotIndex)
+                    .GetComponent<RectTransform>();
+                rt.GetWorldCorners(corners);
 
-                    Texture2D texture = new Texture2D(SQUARE_SIZE, SQUARE_SIZE);
-                    Color randomColor = new Color(Random.value, Random.value, Random.value);
-                    Color[] pixels = new Color[SQUARE_SIZE * SQUARE_SIZE];
-                    for (int h = 0; h < pixels.Length; h++)
-                    {
-                        pixels[h] = randomColor;
-                    }
-                    texture.SetPixels(pixels);
-                    texture.Apply();
-                    Sprite squareSprite = Sprite.Create(texture, new Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE), new Vector2(0.5f, 0.5f));
+                float slotWidth = Mathf.Abs(corners[2].x - corners[0].x);
+                float slotHeight = Mathf.Abs(corners[2].y - corners[0].y);
 
-                }
+                Vector3 screenDims = new Vector3(slotWidth, slotHeight, 0);
+                Vector3 worldDims = mainCamera.ScreenToWorldPoint(screenDims);
+
+                queuePiece.transform.localScale = worldDims / Max(queuePiece.width, queuePiece.height);
+
+                pieces[slotIndex] = queuePiece;
             }
         }
-        return parent;
     }
-    */
 }

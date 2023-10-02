@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static System.Math;
 
 public class QueuePiece : MonoBehaviour
 {
     public static List<bool[,]> pieces = new List<bool[,]>();
     public static List<Texture2D> textures = new List<Texture2D>();
 
-    Piece[,] tiles;
-    int height, width;
+    GameObject[,] tiles;
+    public int height, width;
 
     public static bool[,] Ipiece = new bool[,] {
         {true, true, true, true}
@@ -55,12 +56,15 @@ public class QueuePiece : MonoBehaviour
     };
 
     public static bool[,] MediumIpiece = new bool[,] {
-        {true, true, true}
+        {true},
+        {true},
+        {true}
     };
 
     public static void Init()
     {
-        const string pref = "textures/items/";
+        const string pref = "Textures/items/";
+
         pieces.Add(Ipiece);
         textures.Add(Resources.Load<Texture2D>(pref + "4x1_wrench"));
 
@@ -92,35 +96,34 @@ public class QueuePiece : MonoBehaviour
         textures.Add(Resources.Load<Texture2D>(pref + "1x3_bottle"));
     }
 
-    public static QueuePiece Generate()
+    public void Generate()
     {
         int index = Random.Range(0, pieces.Count);
         bool[,] filled = pieces[index];
         Texture2D tex = textures[index];
 
-        GameObject pieceObj = Instantiate(QueueUpPieces.queuePiecePrefab);
-        QueuePiece qp = pieceObj.GetComponent<QueuePiece>();
-        qp.height = filled.GetLength(0);
-        qp.width = filled.GetLength(1);
-        qp.tiles = new Piece[qp.height, qp.width];
+        height = filled.GetLength(0);
+        width = filled.GetLength(1);
+        tiles = new GameObject[height, width];
 
-        for (int i = 0; i < qp.height; i++)
+        for (int i = 0; i < height; i++)
         {
-            for (int j = 0; j < qp.width; j++)
+            for (int j = 0; j < width; j++)
             {
                 if (filled[i, j])
                 {
-                    var o = Instantiate(GameObject.Find("Piece"), qp.transform);
+                    var o = Instantiate(QueueUpPieces.piecePrefab);
+                    o.transform.parent = transform;
                     o.transform.localScale = Vector2.one;
-                    qp.tiles[i, j] = o.GetComponent<Piece>();
-                    qp.tiles[i, j].sprite = Sprite.Create(tex, new Rect(j, i, 1, 1), new Vector2(0.5f, 0.5f), 16);
-                    qp.tiles[i, j].transform.Translate(qp.tiles[i, j].transform.localToWorldMatrix.MultiplyVector(new Vector3(j, i, 0)));
+                    tiles[i, j] = o;
+
+                    o.GetComponent<SpriteRenderer>().sprite = Sprite.Create(
+                        tex, new Rect(j * 16, (height - i - 1) * 16, 16, 16),
+                        new Vector2(0.5f, 0.5f), 16);
+                    o.GetComponent<SpriteRenderer>().sortingOrder = 15;
+                    tiles[i, j].transform.Translate(tiles[i, j].transform.localToWorldMatrix.MultiplyVector(new Vector3(j, height - i - 1, 0)));
                 }
             }
         }
-
-        return qp;
     }
 }
-
-
