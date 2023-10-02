@@ -4,24 +4,46 @@ using UnityEngine;
 
 public class QueueUpPieces : MonoBehaviour
 {
-    
-    public int squareSize = 64;
-    public float spawnTimer = 3f;
-    private float spawnTime = 0;
-    public GameObject pieceSourcePrefab;
-    public GameObject piecePrefab;
+    public const int SQUARE_SIZE = 64;
+    public const float SPAWN_INTERVAL = 3f;
+    private float spawnTimer = SPAWN_INTERVAL;
 
-    public int count = 0;
+    public const int QUEUE_SIZE = 8;
+    private QueuePiece[] pieces = new QueuePiece[QUEUE_SIZE];
+
+    public static GameObject queuePiecePrefab;
+    public static GameObject piecePrefab;
+
+    void Start()
+    {
+        queuePiecePrefab = Resources.Load<GameObject>("Prefabs/QueuePiecePrefab");
+        piecePrefab = Resources.Load<GameObject>("Prefabs/PiecePrefab");
+        QueuePiece.Init();
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if (spawnTime + spawnTimer < Time.time) {
-            spawnTime = Time.time;
-            GameObject p = SpawnPiece();
-            count+=3;
+        if ((spawnTimer -= Time.deltaTime) <= 0)
+        {
+            spawnTimer += SPAWN_INTERVAL;
+            QueuePiece newPiece = QueuePiece.Generate();
+            bool spotFound = false;
+            for (int i = 0; !spotFound && i < pieces.Length; i++)
+            {
+                if (pieces[i] == null)
+                {
+                    pieces[i] = newPiece;
+                    pieces[i].transform.parent = transform.GetChild(i);
+                    pieces[i].transform.localPosition = Vector3.zero;
+                    spotFound = true;
+                }
+            }
+            // todo: if (!spotFound) {GAME OVER}
         }
     }
 
+    /*
     public GameObject SpawnPiece() {
         GameObject parent = Instantiate(pieceSourcePrefab, new Vector3(count, 0, 0), Quaternion.identity);
         QueuePiece p = parent.GetComponent<QueuePiece>();
@@ -37,20 +59,21 @@ public class QueueUpPieces : MonoBehaviour
                     piece.transform.localRotation = Quaternion.identity;
                     piece.transform.localScale = Vector3.one;
 
-                    Texture2D texture = new Texture2D(squareSize, squareSize);
+                    Texture2D texture = new Texture2D(SQUARE_SIZE, SQUARE_SIZE);
                     Color randomColor = new Color(Random.value, Random.value, Random.value);
-                    Color[] pixels = new Color[squareSize * squareSize];
+                    Color[] pixels = new Color[SQUARE_SIZE * SQUARE_SIZE];
                     for (int h = 0; h < pixels.Length; h++)
                     {
                         pixels[h] = randomColor;
                     }
                     texture.SetPixels(pixels);
                     texture.Apply();
-                    Sprite squareSprite = Sprite.Create(texture, new Rect(0, 0, squareSize, squareSize), new Vector2(0.5f, 0.5f));
+                    Sprite squareSprite = Sprite.Create(texture, new Rect(0, 0, SQUARE_SIZE, SQUARE_SIZE), new Vector2(0.5f, 0.5f));
 
                 }
             }
         }
         return parent;
     }
+    */
 }
