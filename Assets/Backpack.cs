@@ -34,7 +34,7 @@ public class Backpack : MonoBehaviour
                     tex.SetPixel(0, 0, c);
                     tex.Apply();
 
-                    var o = GameObject.Instantiate(GameObject.Find("Piece"));
+                    var o = Instantiate(GameObject.Find("Piece"));
                     o.transform.parent = transform;
                     o.transform.localScale = Vector2.one;
                     pieces[i, j] = o.GetComponent<Piece>();
