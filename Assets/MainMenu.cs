@@ -7,7 +7,7 @@ public class MainMenu : MonoBehaviour
 {
     public void Start()
     {
-        SceneManager.UnloadSceneAsync("SampleScene");
+        //SceneManager.UnloadSceneAsync("SampleScene");
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("MainMenu"));
     }
 
